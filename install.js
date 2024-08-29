@@ -4,8 +4,8 @@ import os from 'os';
 
 const installConda = async () => {
     const platform = os.platform();
-    console.log(platform)
-    console.log(os.homedir())
+    console.log("platform:", platform);
+    console.log("Directory:", os.homedir());
     console.log('Checking for Conda installation...');
     try {
         execSync('conda --version', { stdio: 'pipe' });
