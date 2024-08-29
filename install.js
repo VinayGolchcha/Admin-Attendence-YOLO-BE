@@ -3,6 +3,9 @@ import path from 'path';
 import os from 'os';
 
 const installConda = async () => {
+    const platform = os.platform();
+    console.log(platform)
+    console.log(os.homedir())
     console.log('Checking for Conda installation...');
     try {
         execSync('conda --version', { stdio: 'pipe' });
@@ -10,8 +13,8 @@ const installConda = async () => {
     } catch (error) {
         console.log('Conda is not installed. Installing Miniconda...');
 
-        const platform = os.platform();
         let installerUrl, installerPath, condaPath;
+
 
         if (platform === 'win32') {
             installerUrl = 'https://repo.anaconda.com/miniconda/Miniconda3-latest-Windows-x86_64.exe';
@@ -47,8 +50,8 @@ const installConda = async () => {
 const setupEnvironment = async () => {
     console.log('Creating/Updating Conda environment...');
     try {
-        const condaCommand = os.platform() === 'win32' ? 'conda.exe' : 'conda';
-        const condaPath = path.join(os.homedir(), os.platform() === 'win32' ? 'Miniconda3' : 'miniconda3', 'bin', condaCommand);
+        const condaCommand = os.platform() === 'win32' ? 'conda.bat' : 'conda';
+        const condaPath = path.join(os.homedir(), os.platform() === 'win32' ? 'Miniconda3' : 'miniconda3', 'condabin', condaCommand);
 
         // Use the full path to conda
         const envList = execSync(`${condaPath} env list`).toString();
