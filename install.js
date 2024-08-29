@@ -3,6 +3,9 @@ import path from 'path';
 import os from 'os';
 
 const installConda = async () => {
+    const platform = os.platform();
+    console.log(platform)
+    console.log(os.homedir())
     console.log('Checking for Conda installation...');
     try {
         execSync('conda --version', { stdio: 'pipe' });
@@ -10,18 +13,21 @@ const installConda = async () => {
     } catch (error) {
         console.log('Conda is not installed. Installing Miniconda...');
 
-        const platform = os.platform();
-        let installerUrl, installerPath;
+        let installerUrl, installerPath, condaPath;
+
 
         if (platform === 'win32') {
             installerUrl = 'https://repo.anaconda.com/miniconda/Miniconda3-latest-Windows-x86_64.exe';
             installerPath = path.join(os.tmpdir(), 'Miniconda3-latest-Windows-x86_64.exe');
+            condaPath = path.join(os.homedir(), 'Miniconda3', 'Scripts', 'conda.exe');
         } else if (platform === 'darwin') {
             installerUrl = 'https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh';
             installerPath = path.join(os.tmpdir(), 'Miniconda3-latest-MacOSX-x86_64.sh');
+            condaPath = path.join(os.homedir(), 'miniconda3', 'bin', 'conda');
         } else if (platform === 'linux') {
             installerUrl = 'https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh';
             installerPath = path.join(os.tmpdir(), 'Miniconda3-latest-Linux-x86_64.sh');
+            condaPath = path.join(os.homedir(), 'miniconda3', 'bin', 'conda');
         } else {
             throw new Error(`Unsupported platform: ${platform}`);
         }
@@ -34,29 +40,34 @@ const installConda = async () => {
             execSync(`bash ${installerPath} -b -p ${path.join(os.homedir(), 'miniconda3')}`, { stdio: 'inherit' });
         }
         console.log('Miniconda installed successfully.');
+
+        // Add Miniconda to PATH
+        process.env.PATH = `${path.dirname(condaPath)}${path.delimiter}${process.env.PATH}`;
+        console.log(`Miniconda added to PATH: ${condaPath}`);
     }
 };
 
 const setupEnvironment = async () => {
     console.log('Creating/Updating Conda environment...');
     try {
-        // Check if the environment exists
-        const envList = execSync('conda env list').toString();
+        const condaCommand = os.platform() === 'win32' ? 'conda.bat' : 'conda';
+        const condaPath = path.join(os.homedir(), os.platform() === 'win32' ? 'Miniconda3' : 'miniconda3', 'condabin', condaCommand);
+
+        // Use the full path to conda
+        const envList = execSync(`${condaPath} env list`).toString();
         if (envList.includes('conda_env')) {
-            // If the environment exists, update it
             console.log('Conda environment "conda_env" already exists. Updating...');
-            execSync('conda env update -f environment.yml', { stdio: 'inherit' });
-            execSync('conda activate conda_env', { stdio: 'inherit' });
+            execSync(`${condaPath} env update -f environment.yml`, { stdio: 'inherit' });
         } else {
-            // If the environment does not exist, create it
             console.log('Creating new Conda environment "conda_env"...');
-            execSync('conda env create -f environment.yml', { stdio: 'inherit' });
-            execSync('conda activate conda_env', { stdio: 'inherit' });
+            execSync(`${condaPath} env create -f environment.yml`, { stdio: 'inherit' });
         }
 
         console.log('Conda environment created/updated successfully.');
 
-        // Install Python dependencies if needed
+        // Activate the environment and install Python dependencies if needed
+        console.log('Activating Conda environment...');
+        execSync(`${condaPath} activate conda_env`, { stdio: 'inherit' });
         console.log('Installing Python dependencies...');
         // execSync('pip install -r requirements.txt', { stdio: 'inherit' });
         console.log('Python dependencies installed successfully.');
