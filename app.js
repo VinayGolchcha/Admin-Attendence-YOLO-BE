@@ -5,7 +5,8 @@ import { spawn,exec} from 'child_process';
 import path from 'path';
 import os from 'os';
 import { installConda, setupEnvironment } from './install.js';
-
+import { config } from 'dotenv';
+config()
 await installConda();
 await setupEnvironment();
 const app = express();
@@ -42,7 +43,7 @@ io.on('connection', (socket) => {
     });
 });
 
-// const PORT = 3000;
+let PORT = process.env.PORT || 3000;
 server.listen(process.env.PORT, () => {
     console.log(`Node.js server running on port ${PORT}`);
 });
