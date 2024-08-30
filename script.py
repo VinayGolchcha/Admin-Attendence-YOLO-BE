@@ -45,7 +45,8 @@ def handle_disconnect():
 
 # List of RTSP streams
 rtsp_streams = [
-    "rtsp://192.168.1.28:5543/c09aa8be6a70054108fb66336c2b82c9/live/channel0"
+    "rtsp://192.168.1.28:5543/c09aa8be6a70054108fb66336c2b82c9/live/channel0",
+    0
 ]
 
 # Load the YOLO model
@@ -146,8 +147,7 @@ def start_streams():
 
 if __name__ == '__main__':
     # Connect to the Node.js server
-    sio.connect('https://admin-attendence-yolo-be.onrender.com')
-    host = os.getenv('https://admin-attendence-yolo-be.onrender.com', 'http://localhost:3000')
+    sio.connect(server_url)
     # Start processing streams in separate threads
     for rtsp_url in rtsp_streams:
         print('rtsp_url:', rtsp_url)
