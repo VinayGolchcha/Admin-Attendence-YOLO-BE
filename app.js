@@ -12,7 +12,7 @@ const app = express();
 const server = createServer(app);
 const io = new Server(server);
 const condaPath = path.join(os.homedir(), os.platform() === 'win32' ? 'Miniconda3' : 'miniconda3', 'condabin', os.platform() === 'win32' ? 'conda.bat' : 'conda');
-const pythonProcess = spawn(condaPath, ['run', '-n', 'conda_env', 'python', 'script.py']); // Update path and python version as needed
+const pythonProcess = spawn(condaPath, ['run', '-n', 'conda_env', 'python', 'script.py']);
 
 io.on('connection', (socket) => {
     console.log('Client connected');
@@ -42,7 +42,7 @@ io.on('connection', (socket) => {
     });
 });
 
-const PORT = 3000;
-server.listen(PORT, () => {
+// const PORT = 3000;
+server.listen(process.env.PORT, () => {
     console.log(`Node.js server running on port ${PORT}`);
 });

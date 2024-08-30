@@ -6,11 +6,18 @@ import math
 import base64
 import time
 import socketio
+import os
 from threading import Thread
 
 print("Python script has started running")
 app = Flask(__name__)
+environment = os.getenv('NODE_ENV', 'development')
 
+# Set the server URL based on the environment
+if environment == 'production':
+    server_url = os.getenv('PROD_SERVER_URL')
+else:
+    server_url = os.getenv('LOCAL_SERVER_URL')
 
 # Flask SocketIO initialization
 flask_socketio = SocketIO(app, cors_allowed_origins="*")
@@ -139,13 +146,13 @@ def start_streams():
 
 if __name__ == '__main__':
     # Connect to the Node.js server
-    sio.connect('http://localhost:3000')
-
+    sio.connect('https://admin-attendence-yolo-be.onrender.com')
+    host = os.getenv('https://admin-attendence-yolo-be.onrender.com', 'http://localhost:3000')
     # Start processing streams in separate threads
     for rtsp_url in rtsp_streams:
         print('rtsp_url:', rtsp_url)
         start_streams()
         # flask_socketio.start_background_task(target=generate_frames, rtsp_url=rtsp_url)
-
+    port = int(os.environ.get('PORT', 5000))
     # Run Flask app
-    flask_socketio.run(app, host='0.0.0.0', port=5000, allow_unsafe_werkzeug=True)
+    flask_socketio.run(app, host='0.0.0.0', port=port, allow_unsafe_werkzeug=True)
